@@ -1,9 +1,12 @@
 from django.contrib import admin
 from .models import Agendamento
+from .forms import AgendamentoAdminForm
 
 @admin.register(Agendamento)
 class AgendamentosAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'servico', 'data_hora', 'status')
-    list_filter = ('status', 'data_hora')
+    form = AgendamentoAdminForm
+    
+    list_display = ('cliente', 'servico', 'data','hora', 'status')
+    list_filter = ('status', 'data')
     search_fields = ('cliente__nome', 'servico__nome')
-    ordering = ('data_hora',)
+    ordering = ('-data',)
