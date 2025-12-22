@@ -40,7 +40,7 @@ class Agendamento(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['data', 'hora', 'servico'],
+                fields=['data', 'hora'],
                 name='unique_agendamento_por_servico'
             )
         ]
