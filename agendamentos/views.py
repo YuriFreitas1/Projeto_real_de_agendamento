@@ -33,3 +33,7 @@ def criar_agendamento(request):
         form = AgendamentoPublicoForm()
 
     return render(request, 'agendamentos/criar_agendamento.html', {'form': form})
+
+
+def agendamento_sucesso(request):
+    return render(request, 'agendamentos/agendamento_sucesso.html')

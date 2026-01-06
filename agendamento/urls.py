@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from agendamentos import views
-from agendamentos.views import criar_agendamento
+from agendamentos.views import criar_agendamento,agendamento_sucesso
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('agendar/',criar_agendamento,name='criar_agendamento'),
+    path('agendamento_sucesso/', views.agendamento_sucesso, name='agendamento_sucesso'),
     
 ]
 
