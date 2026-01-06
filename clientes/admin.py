@@ -5,3 +5,4 @@ from .models import Cliente
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ('nome', 'telefone', 'email')
     search_fields = ('nome', 'telefone', 'email')
+    

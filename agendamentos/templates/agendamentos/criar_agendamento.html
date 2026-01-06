@@ -1,8 +1,17 @@
-<h1>Agendar horário</h1>
+{% extends "base.html" %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% block title %}Novo agendamento{% endblock %}
 
-    <button type="submit">Agendar</button>
-</form>
+{% block content %}
+    <h1 class="mb-4">Agendar serviço</h1>
+
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-success mt-3">
+            Confirmar agendamento
+        </button>
+    </form>
+{% endblock %}

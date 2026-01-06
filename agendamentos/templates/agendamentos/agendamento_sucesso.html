@@ -1,1 +1,17 @@
-<h1>Seu agendamento foi realizado com sucesso!</h1>
+{% extends "base.html" %}
+
+{% block title %}Agendamento realizado{% endblock %}
+
+{% block content %}
+    <h1 class="mb-3">Agendamento realizado 🎉</h1>
+
+    <p>
+        Obrigado <strong>{{ cliente_nome }}</strong>!<br>
+        Seu agendamento do serviço
+        <strong>{{ servico_nome }}</strong> foi confirmado.
+    </p>
+
+    <a href="{% url 'criar_agendamento' %}" class="btn btn-primary mt-3">
+        Novo agendamento
+    </a>
+{% endblock %}
