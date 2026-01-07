@@ -9,6 +9,9 @@
         Obrigado <strong>{{ cliente_nome }}</strong>!<br>
         Seu agendamento do serviço
         <strong>{{ servico_nome }}</strong> foi confirmado.
+        <br>
+        Data: <strong>{{ data }}</strong>
+        Hora: <strong>{{ hora }}</strong><br>
     </p>
 
     <a href="{% url 'criar_agendamento' %}" class="btn btn-primary mt-3">

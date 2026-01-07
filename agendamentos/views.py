@@ -1,4 +1,3 @@
-from urllib import request
 from django.shortcuts import render, redirect
 from clientes.models import Cliente
 from .models import Agendamento
@@ -32,7 +31,8 @@ def criar_agendamento(request):
             request.session['agendamento_id'] = agendamento.id
             request.session['cliente_nome'] = cliente.nome
             request.session['servico_nome'] = servico.nome
-          
+            request.session['agendamento_data'] = str(agendamento.data)
+            request.session['agendamento_hora'] = str(agendamento.hora)
 
             messages.success(request, 'Agendamento criado com sucesso!')
 
@@ -52,17 +52,25 @@ def agendamento_sucesso(request):
     agendamento_id = request.session.get('agendamento_id')
     cliente_nome = request.session.get('cliente_nome')
     servico_nome = request.session.get('servico_nome')
+    data = request.session.get('agendamento_data')
+    hora = request.session.get('agendamento_hora')
 
 
     context = {
         'agendamento_id': agendamento_id,
         'cliente_nome': cliente_nome,
         'servico_nome': servico_nome,
+        'data': data,
+        'hora': hora,
         }
     
-    request.session.pop('agendamento_id', None)
-    request.session.pop('cliente_nome', None)
-    request.session.pop('servico_nome', None)
+
+    for key in ['agendamento_id',
+                'cliente_nome',
+                'servico_nome',
+                'agendamento_data',
+                'agendamento_hora']:
+        request.session.pop(key, None)
 
     return render(request, 'agendamentos/agendamento_sucesso.html',context)
 

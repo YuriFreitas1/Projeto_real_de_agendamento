@@ -42,27 +42,28 @@ class AgendamentoAdminForm(forms.ModelForm):
 #---------------------------------------------------
 
 class AgendamentoPublicoForm(forms.Form):
-    nome = forms.CharField(
-        label="Nome",
-        max_length=100
-    )
+    nome = forms.CharField(label="Nome", max_length=100)
+    telefone = forms.CharField(label="Telefone", max_length=20)
+    servico = forms.ModelChoiceField(queryset=Servico.objects.all())
+    data = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    hora = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
 
-    telefone = forms.CharField(
-        label="Telefone",
-        max_length=20
-    )
+    def clean(self):
+        cleaned_data = super().clean()
+        servico = cleaned_data.get('servico')
+        data = cleaned_data.get('data')
+        hora = cleaned_data.get('hora')
 
-    servico = forms.ModelChoiceField(
-        queryset=Servico.objects.all(),
-        label="Serviço"
-    )
+        if servico and data and hora:
+            existe = Agendamento.objects.filter(
+                servico=servico,
+                data=data,
+                hora=hora
+            ).exists()
 
-    data = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        label="Data"
-    )
+            if existe:
+                raise forms.ValidationError(
+                    "⚠️ Este horário já está ocupado. Escolha outro."
+                )
 
-    hora = forms.TimeField(
-        widget=forms.TimeInput(attrs={'type': 'time'}),
-        label="Hora"
-    )
+        return cleaned_data
