@@ -38,15 +38,19 @@ class Agendamento(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['data', 'hora'],
-                name='unique_agendamento_por_servico'
-            )
-        ]
         ordering = ['data', 'hora']
 
     def __str__(self):
         return f'{self.cliente} - {self.servico} - {self.data} {self.hora}'
 
+class Disponibilidade(models.Model):
+    data = models.DateField()
+    hora = models.TimeField()
+    ativo = models.BooleanField(default=True)
 
+    class Meta:
+        unique_together = ('data', 'hora')
+        ordering = ['data', 'hora']
+
+    def __str__(self):
+        return f"{self.data} - {self.hora}"
