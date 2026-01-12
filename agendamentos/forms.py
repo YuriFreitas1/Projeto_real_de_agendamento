@@ -2,67 +2,88 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import datetime
-from .models import Agendamento,Servico
+from .models import Agendamento, Servico, Disponibilidade
 
-
+# =========================================================
 class AgendamentoAdminForm(forms.ModelForm):
+    data = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='Data'
+    )
+
+    hora = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        label='Hora'
+    )
+
     class Meta:
         model = Agendamento
-        fields = '__all__'
+        fields = ('cliente', 'servico', 'status')
 
     def clean(self):
         cleaned_data = super().clean()
-
         data = cleaned_data.get('data')
         hora = cleaned_data.get('hora')
 
-        if data and hora:
-            data_hora = timezone.make_aware(
-                datetime.combine(data, hora)
+        if not data or not hora:
+            return cleaned_data
+
+        #  Bloquear agendamento no passado
+        data_hora = timezone.make_aware(
+            datetime.combine(data, hora)
+        )
+
+        if data_hora < timezone.now():
+            raise ValidationError(
+                "Não é possível criar agendamento no passado."
             )
 
-            if data_hora < timezone.now():
-                raise ValidationError(
-                    "Não é possível criar agendamento no passado."
-                )
+        #  Bloquear horário duplicado
+        conflito = Agendamento.objects.filter(
+            disponibilidade__data=data,
+            disponibilidade__hora=hora
+        ).exclude(pk=self.instance.pk)
 
-        if data and hora:
-            conflito = Agendamento.objects.filter(
-                data=data,
-                hora=hora,
-            ).exclude(pk=self.instance.pk)
-
-            if conflito.exists():
-                raise ValidationError(
-                    "Já existe um agendamento para esse dia e horário."
-                )
+        if conflito.exists():
+            raise ValidationError(
+                "Já existe um agendamento para esse dia e horário."
+            )
 
         return cleaned_data
-    
-#---------------------------------------------------
 
+
+
+# ==========================================================
 class AgendamentoPublicoForm(forms.Form):
     nome = forms.CharField(label="Nome", max_length=100)
     telefone = forms.CharField(label="Telefone", max_length=20)
-    servico = forms.ModelChoiceField(queryset=Servico.objects.all())
-    data = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    hora = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
+    servico = forms.ModelChoiceField(
+        queryset=Servico.objects.all(),
+        label="Serviço"
+    )
+    data = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label="Data"
+    )
+    hora = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        label="Hora"
+    )
 
     def clean(self):
         cleaned_data = super().clean()
-        servico = cleaned_data.get('servico')
         data = cleaned_data.get('data')
         hora = cleaned_data.get('hora')
 
-        if servico and data and hora:
-            existe = Agendamento.objects.filter(
-                servico=servico,
+        if data and hora:
+            existe = Disponibilidade.objects.filter(
                 data=data,
-                hora=hora
+                hora=hora,
+                ativo=False
             ).exists()
 
             if existe:
-                raise forms.ValidationError(
+                raise ValidationError(
                     "⚠️ Este horário já está ocupado. Escolha outro."
                 )
 

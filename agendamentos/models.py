@@ -27,8 +27,12 @@ class Agendamento(models.Model):
         related_name='agendamentos'
     )
 
-    data = models.DateField()
-    hora = models.TimeField()
+    disponibilidade = models.OneToOneField(
+        'Disponibilidade',
+        on_delete=models.PROTECT,
+        related_name='agendamento'
+)
+
     criado_em = models.DateTimeField(auto_now_add=True)
 
     status = models.CharField(
@@ -38,10 +42,11 @@ class Agendamento(models.Model):
     )
 
     class Meta:
-        ordering = ['data', 'hora']
+        ordering = ['disponibilidade__data', 'disponibilidade__hora']
 
     def __str__(self):
-        return f'{self.cliente} - {self.servico} - {self.data} {self.hora}'
+        return f'{self.cliente} - {self.servico} - {self.disponibilidade.data} {self.disponibilidade.hora}'
+
 
 class Disponibilidade(models.Model):
     data = models.DateField()
@@ -51,6 +56,16 @@ class Disponibilidade(models.Model):
     class Meta:
         unique_together = ('data', 'hora')
         ordering = ['data', 'hora']
+
+    def __str__(self):
+        return f"{self.data} - {self.hora}"
+
+
+class HorarioDisponivel(models.Model):
+    data = models.DateField()
+    hora = models.TimeField()
+    disponivel = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.data} - {self.hora}"
