@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import datetime
 from .models import Agendamento, Servico, Disponibilidade
+from datetime import time
 
 # =========================================================
 class AgendamentoAdminForm(forms.ModelForm):
@@ -86,5 +87,39 @@ class AgendamentoPublicoForm(forms.Form):
                 raise ValidationError(
                     "⚠️ Este horário já está ocupado. Escolha outro."
                 )
+
+        return cleaned_data
+
+
+class GerarDisponibilidadeForm(forms.Form):
+    data = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='Data'
+    )
+
+    hora_inicio = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        label='Hora inicial'
+    )
+
+    hora_fim = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        label='Hora final'
+    )
+
+    intervalo = forms.IntegerField(
+        min_value=5,
+        label='Intervalo (minutos)'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        inicio = cleaned_data.get('hora_inicio')
+        fim = cleaned_data.get('hora_fim')
+
+        if inicio and fim and inicio >= fim:
+            raise ValidationError(
+                "A hora final deve ser maior que a hora inicial."
+            )
 
         return cleaned_data

@@ -23,6 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('agendar/',criar_agendamento,name='criar_agendamento'),
     path('agendamento_sucesso/', views.agendamento_sucesso, name='agendamento_sucesso'),
-    
+    path('gerar_disponibilidades/', views.gerar_disponibilidades, name='gerar_disponibilidades')
 ]
 
